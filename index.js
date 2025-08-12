@@ -14,7 +14,17 @@ const uri = process.env.Mongo_URL;
 
 const app = express();
 
-app.use(cors());
+app.use(
+  cors({
+    origin: [
+      "https://zerodha-frontend-ritik.netlify.app",
+      "http://localhost:3000",
+      "http://localhost:3001",
+    ],
+    methods: ["GET", "POST"],
+    credentials: true,
+  })
+);
 app.use(bodyParser.json());
 
 // app.get("/addHoldings", async (req, res) => {
@@ -204,13 +214,20 @@ app.post("/newOrder", async (req, res) => {
     mode: req.body.mode,
   });
 
-  newOrder.save();
+  await newOrder.save();
 
   res.send("Order saved!");
 });
 
-app.listen(3002, () => {
-  console.log("App started!.");
-  mongoose.connect(uri);
-  console.log("DB connected!");
-});
+mongoose
+  .connect(uri, { useNewUrlParser: true, useUnifiedTopology: true })
+  .then(() => {
+    console.log("DB connected!");
+    app.listen(process.env.PORT || 3002, () => {
+      console.log(`🚀 Server running on port ${process.env.PORT || 3002}`);
+    });
+  })
+  .catch((err) => {
+    console.error("DB connection failed:", err);
+    process.exit(1);
+  });
