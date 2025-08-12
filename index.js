@@ -196,6 +196,11 @@ app.use(bodyParser.json());
 //   res.send("Done!");
 // });
 
+// testing
+app.get("/", (req, res) => {
+  res.send("Backend is running successfully");
+});
+
 app.get("/allHoldings", async (req, res) => {
   let allHldings = await HoldingsModel.find({});
   res.json(allHldings);
